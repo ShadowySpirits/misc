@@ -1,0 +1,1280 @@
+.tpl-diagnosis-agent-share {
+  --panel: rgba(255, 255, 255, .74);
+  --panel-soft: rgba(255, 255, 255, .48);
+}
+
+.tpl-diagnosis-agent-share .slide {
+  padding: 62px 78px;
+}
+
+.tpl-diagnosis-agent-share .kicker,
+.tpl-diagnosis-agent-share .label {
+  font-family: var(--font-mono, monospace);
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  color: var(--accent-2);
+}
+
+.tpl-diagnosis-agent-share .kicker {
+  font-size: 12px;
+  margin: 0 0 16px;
+}
+
+.tpl-diagnosis-agent-share .label {
+  display: block;
+  font-size: 10px;
+  margin-bottom: 9px;
+}
+
+.tpl-diagnosis-agent-share .h1,
+.tpl-diagnosis-agent-share .h2 {
+  font-family: var(--font-display, monospace);
+  color: var(--text-1);
+  letter-spacing: 0;
+  margin: 0;
+}
+
+.tpl-diagnosis-agent-share .h1 {
+  font-size: clamp(52px, 6.5vw, 82px);
+  line-height: 1.04;
+}
+
+.tpl-diagnosis-agent-share .h2 {
+  font-size: clamp(34px, 4.1vw, 50px);
+  line-height: 1.14;
+  max-width: 1540px;
+}
+
+.tpl-diagnosis-agent-share .accent {
+  color: var(--accent-2);
+}
+
+.tpl-diagnosis-agent-share .lede {
+  margin: 28px 0 0;
+  max-width: 920px;
+  font-size: 22px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.tpl-diagnosis-agent-share p,
+.tpl-diagnosis-agent-share li {
+  color: var(--text-2);
+  line-height: 1.52;
+}
+
+.tpl-diagnosis-agent-share code,
+.tpl-diagnosis-agent-share pre {
+  font-family: var(--font-mono, monospace);
+}
+
+.tpl-diagnosis-agent-share pre {
+  margin: 0;
+  white-space: pre-wrap;
+  color: var(--text-1);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.tpl-diagnosis-agent-share ul {
+  margin: 14px 0 0;
+  padding-left: 20px;
+}
+
+.tpl-diagnosis-agent-share li + li {
+  margin-top: 6px;
+}
+
+.tpl-diagnosis-agent-share .cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tpl-diagnosis-agent-share .cover-grid,
+.tpl-diagnosis-agent-share .agenda,
+.tpl-diagnosis-agent-share .case-grid,
+.tpl-diagnosis-agent-share .flow-cards,
+.tpl-diagnosis-agent-share .arch-layers,
+.tpl-diagnosis-agent-share .branches,
+.tpl-diagnosis-agent-share .investigation-grid,
+.tpl-diagnosis-agent-share .evidence-table,
+.tpl-diagnosis-agent-share .evidence-wall,
+.tpl-diagnosis-agent-share .tag-row,
+.tpl-diagnosis-agent-share .eval-grid,
+.tpl-diagnosis-agent-share .rule-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.tpl-diagnosis-agent-share .cover-grid {
+  grid-template-columns: 1.45fr .8fr 1.2fr;
+  gap: 0;
+  margin-top: 58px;
+  border: 1px solid var(--border-strong);
+}
+
+.tpl-diagnosis-agent-share .cover-grid > div {
+  min-height: 126px;
+  padding: 22px 24px;
+  background: var(--panel);
+  border-right: 1px solid var(--border-strong);
+}
+
+.tpl-diagnosis-agent-share .cover-grid > div:last-child {
+  border-right: 0;
+}
+
+.tpl-diagnosis-agent-share .cover-grid strong {
+  display: block;
+  font-size: 18px;
+  line-height: 1.45;
+  color: var(--text-1);
+}
+
+.tpl-diagnosis-agent-share .agenda {
+  margin-top: 34px;
+}
+
+.tpl-diagnosis-agent-share .agenda-row {
+  display: grid;
+  grid-template-columns: 58px 220px 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px;
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+}
+
+.tpl-diagnosis-agent-share .agenda-row span,
+.tpl-diagnosis-agent-share .flow-cards span {
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  color: var(--accent-2);
+}
+
+.tpl-diagnosis-agent-share .agenda-row strong {
+  color: var(--text-1);
+  font-size: 22px;
+}
+
+.tpl-diagnosis-agent-share .agenda-row p,
+.tpl-diagnosis-agent-share .agenda-row em {
+  margin: 0;
+}
+
+.tpl-diagnosis-agent-share .agenda-row em {
+  font-style: normal;
+  font-family: var(--font-mono, monospace);
+  color: var(--text-3);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.tpl-diagnosis-agent-share .demo-layout {
+  display: grid;
+  grid-template-columns: .92fr 1.35fr;
+  gap: 24px;
+  margin-top: 26px;
+}
+
+.tpl-diagnosis-agent-share .question-box,
+.tpl-diagnosis-agent-share .flow-cards > div,
+.tpl-diagnosis-agent-share .case-grid > div,
+.tpl-diagnosis-agent-share .arch-layers > div,
+.tpl-diagnosis-agent-share .node,
+.tpl-diagnosis-agent-share .investigation-grid > div,
+.tpl-diagnosis-agent-share .evidence-table > div,
+.tpl-diagnosis-agent-share .evidence-wall > div,
+.tpl-diagnosis-agent-share .pyramid > div,
+.tpl-diagnosis-agent-share .compare-wide > div,
+.tpl-diagnosis-agent-share .spec-pipeline > div:not(.arrow),
+.tpl-diagnosis-agent-share .eval-grid > div,
+.tpl-diagnosis-agent-share .summary-meta,
+.tpl-diagnosis-agent-share .definition,
+.tpl-diagnosis-agent-share .principle,
+.tpl-diagnosis-agent-share .note-line,
+.tpl-diagnosis-agent-share .big-claim {
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+}
+
+.tpl-diagnosis-agent-share .question-box {
+  padding: 26px 26px;
+  min-height: 360px;
+}
+
+.tpl-diagnosis-agent-share .question-box p {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.7;
+  color: var(--text-1);
+}
+
+.tpl-diagnosis-agent-share .question-box b {
+  color: var(--accent-2);
+  font-weight: 800;
+}
+
+.tpl-diagnosis-agent-share .flow-cards {
+  grid-template-columns: 1fr 1fr;
+}
+
+.tpl-diagnosis-agent-share .flow-cards > div {
+  padding: 20px 20px;
+  min-height: 172px;
+}
+
+.tpl-diagnosis-agent-share .flow-cards strong,
+.tpl-diagnosis-agent-share .case-grid h3,
+.tpl-diagnosis-agent-share .arch-layers strong,
+.tpl-diagnosis-agent-share .investigation-grid strong,
+.tpl-diagnosis-agent-share .evidence-table strong,
+.tpl-diagnosis-agent-share .eval-grid strong,
+.tpl-diagnosis-agent-share .compare-wide h3 {
+  display: block;
+  margin: 10px 0 8px;
+  color: var(--text-1);
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.tpl-diagnosis-agent-share .flow-cards p,
+.tpl-diagnosis-agent-share .case-grid p,
+.tpl-diagnosis-agent-share .arch-layers p,
+.tpl-diagnosis-agent-share .investigation-grid p,
+.tpl-diagnosis-agent-share .evidence-table p,
+.tpl-diagnosis-agent-share .evidence-wall p,
+.tpl-diagnosis-agent-share .eval-grid p {
+  margin: 0;
+}
+
+.tpl-diagnosis-agent-share .feedback-strip,
+.tpl-diagnosis-agent-share .pipeline-line,
+.tpl-diagnosis-agent-share .loop-line,
+.tpl-diagnosis-agent-share .cycle {
+  display: grid;
+  align-items: center;
+  gap: 0;
+  margin-top: 22px;
+}
+
+.tpl-diagnosis-agent-share .feedback-strip {
+  grid-template-columns: 1fr 46px 1fr 46px 1fr;
+}
+
+.tpl-diagnosis-agent-share .pipeline-line {
+  grid-template-columns: 1fr 34px 1fr 34px 1fr 34px 1.2fr 34px 1.3fr;
+}
+
+.tpl-diagnosis-agent-share .pipeline-line.compact {
+  grid-template-columns: 1.15fr 42px 1fr 42px 1.25fr 42px 1.35fr;
+}
+
+.tpl-diagnosis-agent-share .loop-line {
+  grid-template-columns: 1fr 34px 1fr 34px 1fr 34px 1fr 34px 1fr 34px 1fr;
+}
+
+.tpl-diagnosis-agent-share .cycle {
+  grid-template-columns: 1fr 32px 1fr 32px 1fr 32px 1fr 32px 1fr;
+  margin: 0;
+}
+
+.tpl-diagnosis-agent-share .feedback-strip span,
+.tpl-diagnosis-agent-share .pipeline-line span,
+.tpl-diagnosis-agent-share .loop-line span,
+.tpl-diagnosis-agent-share .cycle span,
+.tpl-diagnosis-agent-share .tag-row span,
+.tpl-diagnosis-agent-share .rule-grid span {
+  padding: 14px 16px;
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+  text-align: center;
+  font-family: var(--font-mono, monospace);
+  color: var(--text-1);
+  font-size: 13px;
+}
+
+.tpl-diagnosis-agent-share .feedback-strip b,
+.tpl-diagnosis-agent-share .pipeline-line b,
+.tpl-diagnosis-agent-share .loop-line b,
+.tpl-diagnosis-agent-share .cycle b,
+.tpl-diagnosis-agent-share .arrow {
+  height: 1px;
+  background: var(--border-strong);
+}
+
+.tpl-diagnosis-agent-share .summary-meta {
+  display: grid;
+  grid-template-columns: 1.5fr .8fr .8fr .7fr;
+  align-items: center;
+  gap: 14px;
+  margin-top: 22px;
+  padding: 16px 18px;
+}
+
+.tpl-diagnosis-agent-share .summary-meta strong {
+  color: var(--text-1);
+  font-size: 20px;
+}
+
+.tpl-diagnosis-agent-share .summary-meta span {
+  font-family: var(--font-mono, monospace);
+  color: var(--text-3);
+  font-size: 13px;
+}
+
+.tpl-diagnosis-agent-share .case-grid {
+  grid-template-columns: 1fr 1fr;
+  margin-top: 18px;
+}
+
+.tpl-diagnosis-agent-share .case-grid > div {
+  padding: 22px 24px;
+  min-height: 300px;
+}
+
+.tpl-diagnosis-agent-share .arch-overview {
+  display: grid;
+  grid-template-columns: .95fr 1.05fr;
+  gap: 22px;
+  margin-top: 28px;
+}
+
+.tpl-diagnosis-agent-share .arch-flow {
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+  padding: 18px 20px 20px;
+}
+
+.tpl-diagnosis-agent-share .flow-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.tpl-diagnosis-agent-share .flow-step {
+  border: 1px solid var(--border-strong);
+  background: rgba(255,255,255,.52);
+  padding: 12px 14px;
+}
+
+.tpl-diagnosis-agent-share .flow-step + .flow-step {
+  position: relative;
+}
+
+.tpl-diagnosis-agent-share .flow-step + .flow-step::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 28px;
+  width: 1px;
+  height: 10px;
+  background: var(--border-strong);
+}
+
+.tpl-diagnosis-agent-share .flow-step strong {
+  display: block;
+  color: var(--text-1);
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.tpl-diagnosis-agent-share .flow-step p {
+  margin: 0;
+}
+
+.tpl-diagnosis-agent-share .flow-step ul {
+  margin-top: 6px;
+}
+
+.tpl-diagnosis-agent-share .flow-step li {
+  font-size: 14px;
+  line-height: 1.32;
+}
+
+.tpl-diagnosis-agent-share .flow-step li + li {
+  margin-top: 3px;
+}
+
+.tpl-diagnosis-agent-share .flow-step li.subagent {
+  margin-left: 18px;
+  list-style-type: none;
+  color: var(--text-1);
+}
+
+.tpl-diagnosis-agent-share .flow-step li.subagent::before {
+  content: "└ ";
+  color: var(--accent-2);
+}
+
+.tpl-diagnosis-agent-share .triage-hub {
+  border: 2px solid var(--accent-2);
+  color: var(--accent-2);
+  background: var(--panel-soft);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: var(--font-display, monospace);
+  font-size: 42px;
+  line-height: 1.15;
+}
+
+.tpl-diagnosis-agent-share .triage-hub small,
+.tpl-diagnosis-agent-share .node small {
+  display: block;
+  margin-top: 12px;
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.tpl-diagnosis-agent-share .arch-layers > div {
+  padding: 18px 22px;
+}
+
+.tpl-diagnosis-agent-share .topology {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.tpl-diagnosis-agent-share .triage-chain {
+  display: grid;
+  grid-template-columns: 1fr 42px 1fr 42px 1fr;
+  align-items: stretch;
+  margin-top: 30px;
+}
+
+.tpl-diagnosis-agent-share .triage-chain > b {
+  align-self: center;
+  height: 1px;
+  background: var(--border-strong);
+}
+
+.tpl-diagnosis-agent-share .triage-step,
+.tpl-diagnosis-agent-share .context-output > div {
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+  padding: 24px;
+}
+
+.tpl-diagnosis-agent-share .triage-step span {
+  display: block;
+  font-family: var(--font-mono, monospace);
+  color: var(--accent-2);
+  font-weight: 800;
+  margin-bottom: 18px;
+}
+
+.tpl-diagnosis-agent-share .triage-step strong,
+.tpl-diagnosis-agent-share .context-output strong {
+  display: block;
+  color: var(--text-1);
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.tpl-diagnosis-agent-share .triage-step p,
+.tpl-diagnosis-agent-share .context-output p {
+  margin: 0;
+}
+
+.tpl-diagnosis-agent-share .context-output {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.tpl-diagnosis-agent-share .branches {
+  grid-template-columns: 1fr 1fr;
+}
+
+.tpl-diagnosis-agent-share .node {
+  padding: 24px;
+  color: var(--text-1);
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.tpl-diagnosis-agent-share .node.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  border: 2px solid var(--accent-2);
+  color: var(--accent-2);
+  font-family: var(--font-display, monospace);
+  font-size: 32px;
+}
+
+.tpl-diagnosis-agent-share .rule-grid {
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 22px;
+}
+
+.tpl-diagnosis-agent-share .rule-grid.four {
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 18px;
+}
+
+.tpl-diagnosis-agent-share .investigation-grid {
+  grid-template-columns: .9fr 1.1fr 1.1fr;
+  margin-top: 30px;
+}
+
+.tpl-diagnosis-agent-share .investigation-grid > div {
+  padding: 24px;
+  min-height: 320px;
+}
+
+.tpl-diagnosis-agent-share .note-line,
+.tpl-diagnosis-agent-share .principle {
+  margin-top: 22px;
+  padding: 18px 22px;
+  font-size: 20px;
+  color: var(--text-1);
+  text-align: center;
+}
+
+.tpl-diagnosis-agent-share .evidence-table {
+  grid-template-columns: 1fr;
+  margin-top: 28px;
+  gap: 10px;
+}
+
+.tpl-diagnosis-agent-share .evidence-table > div {
+  display: grid;
+  grid-template-columns: 190px 1fr 300px;
+  gap: 18px;
+  align-items: center;
+  padding: 14px 18px;
+}
+
+.tpl-diagnosis-agent-share .evidence-table strong {
+  margin: 0;
+  font-family: var(--font-mono, monospace);
+  color: var(--accent-2);
+}
+
+.tpl-diagnosis-agent-share .evidence-table span {
+  font-family: var(--font-mono, monospace);
+  color: var(--text-3);
+  font-size: 13px;
+}
+
+.tpl-diagnosis-agent-share .evidence-wall {
+  grid-template-columns: 1fr 1fr;
+  margin-top: 28px;
+}
+
+.tpl-diagnosis-agent-share .evidence-wall > figure {
+  min-height: 190px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+  position: relative;
+  overflow: hidden;
+}
+
+.tpl-diagnosis-agent-share .evidence-wall span {
+  display: inline-block;
+  font-family: var(--font-mono, monospace);
+  color: var(--accent-2);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.tpl-diagnosis-agent-share .evidence-wall img {
+  display: block;
+  width: 100%;
+  height: 178px;
+  object-fit: cover;
+  object-position: top left;
+  border: 1px solid var(--border-strong);
+  background: #fff;
+}
+
+.tpl-diagnosis-agent-share .component-showcase {
+  margin-top: 22px;
+}
+
+.tpl-diagnosis-agent-share .component-stage {
+  position: relative;
+  height: 620px;
+  border: 1px solid var(--border-strong);
+  background: #fff;
+  overflow: hidden;
+}
+
+.tpl-diagnosis-agent-share .component-stage figure {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 22px;
+  opacity: 0;
+  display: none;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+}
+
+.tpl-diagnosis-agent-share .component-stage figure.is-active {
+  display: grid;
+  opacity: 1;
+}
+
+.tpl-diagnosis-agent-share .component-stage span {
+  display: none;
+}
+
+.tpl-diagnosis-agent-share .component-stage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center top;
+  border: 1px solid var(--border-strong);
+  background: #fff;
+  filter: contrast(1.05) saturate(.96);
+}
+
+.tpl-diagnosis-agent-share .component-stage figcaption {
+  margin: 0;
+  color: var(--text-1);
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.tpl-diagnosis-agent-share .component-rail {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-strong);
+}
+
+.tpl-diagnosis-agent-share .component-rail button {
+  appearance: none;
+  border: 0;
+  padding: 12px 14px;
+  border-right: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font-mono, monospace);
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.tpl-diagnosis-agent-share .component-rail button:last-child {
+  border-right: 0;
+}
+
+.tpl-diagnosis-agent-share .component-rail button.is-active {
+  background: var(--panel);
+  color: var(--accent-2);
+  font-weight: 800;
+}
+
+.tpl-diagnosis-agent-share .definition {
+  margin-top: 22px;
+  padding: 18px 22px;
+  color: var(--text-1);
+  font-size: 24px;
+}
+
+.tpl-diagnosis-agent-share .pyramid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.tpl-diagnosis-agent-share .pyramid > div {
+  padding: 16px 24px;
+  text-align: center;
+}
+
+.tpl-diagnosis-agent-share .pyramid > div:nth-child(1) {
+  width: 54%;
+}
+
+.tpl-diagnosis-agent-share .pyramid > div:nth-child(2) {
+  width: 72%;
+}
+
+.tpl-diagnosis-agent-share .pyramid > div:nth-child(3) {
+  width: 90%;
+}
+
+.tpl-diagnosis-agent-share .pyramid strong {
+  display: block;
+  color: var(--text-1);
+  font-size: 20px;
+}
+
+.tpl-diagnosis-agent-share .pyramid p {
+  margin: 8px 0 0;
+}
+
+.tpl-diagnosis-agent-share .tag-row {
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 24px;
+}
+
+.tpl-diagnosis-agent-share .context-thesis {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  align-items: center;
+  margin-top: 22px;
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+}
+
+.tpl-diagnosis-agent-share .context-thesis strong {
+  padding: 18px 22px;
+  border-right: 1px solid var(--border-strong);
+  color: var(--accent-2);
+  font-size: 22px;
+}
+
+.tpl-diagnosis-agent-share .context-thesis span {
+  padding: 18px 22px;
+  color: var(--text-1);
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.tpl-diagnosis-agent-share .context-layout {
+  display: grid;
+  grid-template-columns: 1.18fr .82fr;
+  gap: 20px;
+  margin-top: 22px;
+}
+
+.tpl-diagnosis-agent-share .context-inputs,
+.tpl-diagnosis-agent-share .context-ops {
+  border: 1px solid var(--border-strong);
+  background: var(--paper);
+  padding: 18px;
+}
+
+.tpl-diagnosis-agent-share .section-label {
+  color: var(--accent-2);
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.tpl-diagnosis-agent-share .context-stack {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.tpl-diagnosis-agent-share .context-layer {
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+  padding: 16px 18px;
+}
+
+.tpl-diagnosis-agent-share .context-layer.focus {
+  background: var(--panel-strong, var(--panel));
+  box-shadow: inset 6px 0 0 var(--accent-2);
+}
+
+.tpl-diagnosis-agent-share .context-layer span {
+  display: block;
+  color: var(--accent-2);
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.tpl-diagnosis-agent-share .context-layer strong,
+.tpl-diagnosis-agent-share .context-ops-grid strong {
+  display: block;
+  margin-top: 7px;
+  color: var(--text-1);
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.tpl-diagnosis-agent-share .context-layer p,
+.tpl-diagnosis-agent-share .context-ops-grid p {
+  margin: 8px 0 0;
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.tpl-diagnosis-agent-share .context-ops-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.tpl-diagnosis-agent-share .context-ops-grid > div {
+  min-height: 136px;
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+  padding: 16px;
+}
+
+.tpl-diagnosis-agent-share .funnel {
+  margin-top: 28px;
+}
+
+.tpl-diagnosis-agent-share .funnel-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.tpl-diagnosis-agent-share .funnel-top > div,
+.tpl-diagnosis-agent-share .funnel-mid,
+.tpl-diagnosis-agent-share .funnel-bottom {
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+  padding: 20px 24px;
+  text-align: center;
+}
+
+.tpl-diagnosis-agent-share .funnel-top strong {
+  display: block;
+  color: var(--text-1);
+  font-size: 22px;
+}
+
+.tpl-diagnosis-agent-share .funnel-top p {
+  margin: 8px 0 0;
+}
+
+.tpl-diagnosis-agent-share .funnel-mid {
+  width: 74%;
+  margin: 18px auto 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.tpl-diagnosis-agent-share .funnel-mid span {
+  font-family: var(--font-mono, monospace);
+  color: var(--accent-2);
+  font-weight: 700;
+}
+
+.tpl-diagnosis-agent-share .funnel-bottom {
+  width: 52%;
+  margin: 18px auto 0;
+  color: var(--text-1);
+  font-size: 22px;
+}
+
+.tpl-diagnosis-agent-share .compare-wide {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 22px;
+  margin-top: 30px;
+}
+
+.tpl-diagnosis-agent-share .compare-wide > div {
+  min-height: 430px;
+  padding: 26px;
+}
+
+.tpl-diagnosis-agent-share .compare-wide code {
+  display: inline-block;
+  margin: 8px 8px 0 0;
+  padding: 9px 10px;
+  border: 1px solid var(--border-strong);
+  color: var(--text-1);
+  background: rgba(255,255,255,.52);
+}
+
+.tpl-diagnosis-agent-share .compare-wide .bad {
+  border: 2px solid rgba(192, 57, 43, .9);
+  background: rgba(255, 235, 232, .64);
+}
+
+.tpl-diagnosis-agent-share .compare-wide .good {
+  border: 2px solid rgba(20, 145, 92, .95);
+  background: rgba(226, 250, 238, .72);
+}
+
+.tpl-diagnosis-agent-share .compare-wide .bad .label,
+.tpl-diagnosis-agent-share .query-example-grid .bad .label {
+  color: rgb(176, 48, 38);
+}
+
+.tpl-diagnosis-agent-share .compare-wide .good .label,
+.tpl-diagnosis-agent-share .query-example-grid .good .label {
+  color: rgb(0, 124, 77);
+}
+
+.tpl-diagnosis-agent-share .compare-wide p {
+  margin-top: 24px;
+  font-size: 18px;
+}
+
+.tpl-diagnosis-agent-share .skill-catalog-layout {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.tpl-diagnosis-agent-share .catalog-card,
+.tpl-diagnosis-agent-share .catalog-flow > div,
+.tpl-diagnosis-agent-share .query-example-grid > div {
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+}
+
+.tpl-diagnosis-agent-share .catalog-card {
+  padding: 22px;
+}
+
+.tpl-diagnosis-agent-share .catalog-card h3 {
+  margin: 0 0 10px;
+  color: var(--text-1);
+  font-size: 30px;
+}
+
+.tpl-diagnosis-agent-share .catalog-card p,
+.tpl-diagnosis-agent-share .catalog-flow p,
+.tpl-diagnosis-agent-share .query-example-grid p {
+  margin: 8px 0 0;
+  color: var(--text-2);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.tpl-diagnosis-agent-share .catalog-tree {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.tpl-diagnosis-agent-share .catalog-tree > div {
+  padding: 13px 14px;
+  border: 1px solid var(--border-strong);
+  background: rgba(255,255,255,.48);
+}
+
+.tpl-diagnosis-agent-share .catalog-tree strong,
+.tpl-diagnosis-agent-share .catalog-flow strong {
+  display: block;
+  color: var(--text-1);
+  font-size: 19px;
+}
+
+.tpl-diagnosis-agent-share .catalog-tree span {
+  display: block;
+  margin-top: 5px;
+  color: var(--text-2);
+  font-size: 15px;
+}
+
+.tpl-diagnosis-agent-share .catalog-flow {
+  display: grid;
+  gap: 12px;
+}
+
+.tpl-diagnosis-agent-share .catalog-flow > div {
+  padding: 18px;
+}
+
+.tpl-diagnosis-agent-share .query-example-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 18px;
+}
+
+.tpl-diagnosis-agent-share .query-example-grid > div {
+  padding: 18px;
+}
+
+.tpl-diagnosis-agent-share .query-example-grid .bad {
+  border-color: rgba(192, 57, 43, .9);
+  background: rgba(255, 235, 232, .64);
+}
+
+.tpl-diagnosis-agent-share .query-example-grid .good {
+  border-color: rgba(20, 145, 92, .95);
+  background: rgba(226, 250, 238, .72);
+}
+
+.tpl-diagnosis-agent-share .query-example-grid code {
+  display: block;
+  padding: 12px;
+  border: 1px solid var(--border-strong);
+  background: rgba(255,255,255,.58);
+  color: var(--text-1);
+  font-size: 15px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.tpl-diagnosis-agent-share .spec-pipeline {
+  display: grid;
+  grid-template-columns: 1.05fr 42px .9fr 42px .9fr;
+  align-items: stretch;
+  gap: 0;
+  margin-top: 32px;
+}
+
+.tpl-diagnosis-agent-share .spec-pipeline.compact {
+  grid-template-columns: 1fr 34px 1fr 34px 1fr;
+  margin-top: 22px;
+}
+
+.tpl-diagnosis-agent-share .spec-pipeline > div:not(.arrow) {
+  padding: 22px;
+  min-height: 260px;
+}
+
+.tpl-diagnosis-agent-share .spec-pipeline.compact > div:not(.arrow) {
+  min-height: 118px;
+  padding: 16px 18px;
+}
+
+.tpl-diagnosis-agent-share .spec-pipeline.compact pre,
+.tpl-diagnosis-agent-share .spec-pipeline.compact p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.tpl-diagnosis-agent-share .spec-pipeline .arrow {
+  align-self: center;
+}
+
+.tpl-diagnosis-agent-share .generative-ui-note {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 28px;
+  padding: 20px 22px;
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+}
+
+.tpl-diagnosis-agent-share .generative-ui-note strong {
+  color: var(--text-1);
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.tpl-diagnosis-agent-share .generative-ui-note a {
+  color: var(--accent-2);
+  font-family: var(--font-mono, monospace);
+  font-size: 24px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.tpl-diagnosis-agent-share .deterministic-chart {
+  margin: 18px 0 0;
+  padding: 14px;
+  border: 1px solid var(--border-strong);
+  background: #fff;
+}
+
+.tpl-diagnosis-agent-share .deterministic-chart img {
+  display: block;
+  width: 100%;
+  height: 330px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.tpl-diagnosis-agent-share .deterministic-chart figcaption {
+  margin-top: 10px;
+  color: var(--text-2);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.tpl-diagnosis-agent-share .deterministic-result {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.tpl-diagnosis-agent-share .deterministic-result .deterministic-chart {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.tpl-diagnosis-agent-share .deterministic-result .deterministic-chart img {
+  height: 490px;
+}
+
+.tpl-diagnosis-agent-share .deterministic-benefits {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.tpl-diagnosis-agent-share .deterministic-benefits > div {
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+  padding: 14px 18px;
+}
+
+.tpl-diagnosis-agent-share .deterministic-benefits strong {
+  display: block;
+  color: var(--accent-2);
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.tpl-diagnosis-agent-share .deterministic-benefits p {
+  margin: 8px 0 0;
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: 1.42;
+}
+
+.tpl-diagnosis-agent-share .evolution {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 22px;
+  margin-top: 30px;
+  align-items: stretch;
+}
+
+.tpl-diagnosis-agent-share .eval-claim {
+  margin-top: 34px;
+  color: var(--accent-2);
+  font-family: var(--font-display, monospace);
+  font-size: 34px;
+  line-height: 1.15;
+}
+
+.tpl-diagnosis-agent-share .big-claim {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 26px;
+  color: var(--accent-2);
+  font-family: var(--font-display, monospace);
+  font-size: 32px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.tpl-diagnosis-agent-share .eval-grid {
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 34px;
+  align-items: stretch;
+}
+
+.tpl-diagnosis-agent-share .eval-grid > div {
+  padding: 24px 20px;
+  min-height: 410px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tpl-diagnosis-agent-share .eval-grid p {
+  margin-top: 14px;
+  font-size: 16px;
+  line-height: 1.58;
+}
+
+.tpl-diagnosis-agent-share .eval-grid p.lead {
+  color: var(--accent-2);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.tpl-diagnosis-agent-share .eval-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 22px;
+}
+
+.tpl-diagnosis-agent-share .eval-tags span {
+  display: inline-block;
+  padding: 7px 9px;
+  border: 1px solid var(--border-strong);
+  background: rgba(255,255,255,.54);
+  color: var(--accent-2);
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tpl-diagnosis-agent-share .eval-grid code {
+  font-size: .92em;
+  color: var(--accent-2);
+}
+
+.tpl-diagnosis-agent-share .thankyou {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tpl-diagnosis-agent-share .thankyou .h1 {
+  font-size: clamp(72px, 10vw, 132px);
+  color: var(--accent-2);
+}
+
+.tpl-diagnosis-agent-share .qa {
+  margin-top: 64px;
+  font-family: var(--font-display, monospace);
+  color: var(--text-1);
+  font-size: 42px;
+}
+
+.tpl-diagnosis-agent-share .hint {
+  position: fixed;
+  left: 24px;
+  bottom: 18px;
+  z-index: 30;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+@media (max-width: 900px) {
+  .tpl-diagnosis-agent-share .slide {
+    padding: 36px 28px;
+  }
+
+  .tpl-diagnosis-agent-share .agenda-row,
+  .tpl-diagnosis-agent-share .demo-layout,
+  .tpl-diagnosis-agent-share .arch-overview,
+  .tpl-diagnosis-agent-share .topology,
+  .tpl-diagnosis-agent-share .investigation-grid,
+  .tpl-diagnosis-agent-share .compare-wide,
+  .tpl-diagnosis-agent-share .spec-pipeline,
+  .tpl-diagnosis-agent-share .evolution,
+  .tpl-diagnosis-agent-share .summary-meta,
+  .tpl-diagnosis-agent-share .evidence-table > div {
+    grid-template-columns: 1fr;
+  }
+}

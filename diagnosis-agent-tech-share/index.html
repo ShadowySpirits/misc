@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-themes="engineering-whiteprint,blueprint,corporate-clean,nord,tokyo-night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>从诊断工具到可协作 Agent</title>
+<link rel="stylesheet" href="../.agents/skills/html-ppt/assets/fonts.css">
+<link rel="stylesheet" href="../.agents/skills/html-ppt/assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../.agents/skills/html-ppt/assets/themes/engineering-whiteprint.css">
+<link rel="stylesheet" href="../.agents/skills/html-ppt/assets/animations/animations.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="tpl-diagnosis-agent-share">
+<div class="deck">
+
+  <section class="slide cover" data-title="Cover">
+    <p class="kicker">engineering whiteprint / tech sharing</p>
+    <h1 class="h1">从诊断工具到<br><span class="accent">可协作 Agent</span></h1>
+    <p class="lede">MQTT 智能诊断平台的使用、架构与 Agent 开发经验</p>
+    <aside class="notes">
+      <p>今天分享的主题是从诊断工具到可协作 Agent。这里的重点不是把一个日志查询工具包装成聊天入口，也不是展示模型能写出一段多流畅的报告。</p>
+      <p>我想强调的是另一件事：真实诊断往往不是一次问答，而是一个协作过程。用户输入的问题可能不完整，甚至带着错误前提；系统需要先校验上下文，再组织不同证据源，过程中还要让用户能看到 Agent 做了什么、为什么这么做。</p>
+      <p>所以这场分享会围绕三个关键词展开：可观察，让过程和证据链能被检查；可追问，让用户反馈进入下一轮上下文；可沉淀，让 good case 和 bad case 都能变成后续 Agent 的经验。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Route">
+    <p class="kicker">00 / route map</p>
+    <h2 class="h2">目录</h2>
+    <div class="agenda">
+      <div class="agenda-row">
+        <span>01</span>
+        <strong>使用演示</strong>
+        <p>完整流程演示 / 知识沉淀</p>
+      </div>
+      <div class="agenda-row">
+        <span>02</span>
+        <strong>整体架构</strong>
+        <p>架构总览 / Agent 拓扑 / 多 Agent 排查 / 数据源与工具层 / 前端可观测性</p>
+      </div>
+      <div class="agenda-row">
+        <span>03</span>
+        <strong>设计经验</strong>
+        <p>有效上下文 / 工具设计 / 确定性输出 / 评估与进化路径</p>
+      </div>
+    </div>
+    <aside class="notes">
+      <p>今天的结构很直接：先看系统表面行为，再拆背后的架构，最后抽象出可迁移的开发经验。</p>
+      <p>第一章是使用演示。我会用真实案例说明，用户的问题可以原样复制进来，Agent 应该自己补上下文、过滤错误假设、调度工具，并且在前端流式展示执行过程。</p>
+      <p>第二章讲整体架构，重点不是每个函数怎么写，而是 Triage、Orchestrator、专家 Agent、工具层和前端之间的边界。第三章讲经验，核心是有效上下文、原子工具、确定性输出，以及怎么让 Agent 通过评估和反馈持续演进。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Demo Flow">
+    <p class="kicker">01 / demo / full flow</p>
+    <h2 class="h2">完整流程演示：<br>从错误前提出发，收敛到可验证结论</h2>
+    <div class="demo-layout">
+      <div class="question-box">
+        <span class="label">raw user input</span>
+        <p>帮我诊断这个集群 <b>mqtt-a822z7oq</b> 下的客户端 <b>LE4LG4GB1RZ020010</b>，为什么 <b>3 月 12 日</b> 服务端没有给客户端发送 keep alive response，导致客户端掉线</p>
+      </div>
+      <div class="flow-cards">
+        <div><span>01</span><strong>输入适配</strong><p>把“服务端没回 keep alive”视为待验证假设，而不是直接采信。</p></div>
+        <div><span>02</span><strong>上下文补全</strong><p>Triage 解析时间，发现短 clientId，要求确认完整 ID。</p></div>
+        <div><span>03</span><strong>证据调度</strong><p>先查相似历史，再让 LogAgent 验证当前日志；单客户端问题不把 Metrics 当主证据。</p></div>
+        <div><span>04</span><strong>诊断结论</strong><p>不是服务端漏发 PINGRESP，而是客户端停止 PINGREQ；服务端按 90s 阈值触发超时。</p></div>
+      </div>
+    </div>
+    <div class="feedback-strip"><span>User Feedback</span><b></b><span>下一轮上下文</span><b></b><span>继续追问 / 修正</span></div>
+    <aside class="notes">
+      <p>这页演示的关键不是“Agent 给出了答案”，而是它没有被用户问题中的错误前提带偏。用户说的是服务端没有发送 keep alive response，但这个说法本身只是一个假设。</p>
+      <p>真正应该验证的是：客户端是否持续发送 PINGREQ，服务端是否收到，断连原因是什么，是否存在同 Client ID 的并发接入。这个案例里，Triage 先发现用户输入的是短 clientId，并要求确认完整 ID <code>LE4LG4GB1RZ020010-CGW2</code>。</p>
+      <p>之后 Orchestrator 先通过 summary search 找到同实例、同客户端、同日期的历史经验，再让 LogAgent 重新验证日志。最终结论是客户端停止发送 PINGREQ，服务端在 keepalive 60 秒、超时约 90 秒后按协议触发 <code>keepalive_timeout</code>。同时日志里还有 <code>session_taken_over</code>，说明同 Client ID 多 Pod 接入也在影响连接稳定性。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Knowledge Summary">
+    <p class="kicker">02 / demo / knowledge sedimentation</p>
+    <h2 class="h2">知识沉淀：<br>Good Case 复用经验，Bad Case 指导优化</h2>
+    <div class="summary-meta">
+      <strong>德赛西威上下行消息数不符合业务预期</strong>
+      <span>Conversation Summary v1</span>
+      <span>Instance Diagnosis</span>
+      <span>~1.1M tokens</span>
+    </div>
+    <div class="case-grid">
+      <div>
+        <span class="label">good case / 复用经验</span>
+        <h3>75 个 topic filter -> Too many incoming subscriptions</h3>
+        <p>整批订阅被拒绝；后续同类问题可直接复用排查路径和业务建议。</p>
+        <ul>
+          <li>wildcard 合并订阅</li>
+          <li>拆批订阅</li>
+          <li>提高 maxSubscriptionPerSession</li>
+          <li>监控 SUBACK 失败码</li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">bad case / 反面教材</span>
+        <h3>用户给错 clientId：im_client_19</h3>
+        <p>真实日志客户端是 <code>sim_client_19</code>；“查不到”不能直接变成结论。</p>
+        <ul>
+          <li>topic/time 明确时要反查真实 client</li>
+          <li>订阅拒绝不能直接归因 ACL</li>
+          <li>错误路径要沉淀成下一版约束</li>
+        </ul>
+      </div>
+    </div>
+    <div class="pipeline-line compact"><span>diagnosis report</span><b></b><span>feedback</span><b></b><span>structured summary</span><b></b><span>search / reuse / improve</span></div>
+    <aside class="notes">
+      <p>第二个演示是知识沉淀。Summary 的价值不是把聊天记录缩短，而是把一次诊断拆成可检索、可复用、可复盘的结构化资产。</p>
+      <p>这个德赛西威案例里，good case 是一个很稳定的经验：一次 SUBSCRIBE 里带了 75 个 topic filter，超过限制后整批被拒绝。后续再遇到上下行消息数不符合预期，就可以先检查订阅数量、SUBACK 失败码和 topic filter 分布。</p>
+      <p>同时它也是一个 bad case。用户给的是 <code>im_client_19</code>，但真实日志里是 <code>sim_client_19</code>。如果 Agent 把“查不到客户端”当结论，就会误导用户。正确做法是在 topic 和时间明确时反查真实 client，并把这个失败路径沉淀成 prompt 或 skill 的优化输入。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Architecture Overview">
+    <p class="kicker">03 / architecture / overview</p>
+    <h2 class="h2">整体架构：<br>多智能体协同 + 多数据源整合</h2>
+    <div class="arch-overview">
+      <div class="arch-layers">
+        <div><strong>Presentation</strong><p>React / Chat UI / Sidebar / Charts / Feedback</p></div>
+        <div><strong>Application</strong><p>FastAPI /agent SSE / proxy APIs / conversation / summary</p></div>
+        <div><strong>Orchestration</strong><p>LangGraph + Deep Agents / Orchestrator / Expert Agents</p></div>
+        <div><strong>Data & Knowledge</strong><p>GraphQL / CLS / Prometheus / PostgreSQL / LLM APIs</p></div>
+      </div>
+      <div class="arch-flow">
+        <span class="label">diagnosis flow</span>
+        <div class="flow-stack">
+          <div class="flow-step compact"><strong>用户提问</strong><p>自然语言问题进入诊断系统</p></div>
+          <div class="flow-step">
+            <strong>Triage Agent（分诊）</strong>
+            <ul>
+              <li>意图分类：实例诊断 / 全局发现 / 快速查询 / 通用问答</li>
+              <li>实体校验：实例 -> 客户端 -> 消息</li>
+              <li>时间解析：自然语言 -> ISO 8601</li>
+              <li>智能路由：目标智能体</li>
+            </ul>
+          </div>
+          <div class="flow-step">
+            <strong>DiagnosisManager（编排）</strong>
+            <ul>
+              <li>搜索历史相似案例，避免重复排查</li>
+              <li>动态委派子智能体（并行执行）</li>
+              <li class="subagent">MQTTAgent -> GraphQL</li>
+              <li class="subagent">LogAgent -> CLS 日志</li>
+              <li class="subagent">MetricsAgent -> Prometheus</li>
+              <li>综合分析，生成结构化诊断报告</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="loop-line"><span>问题</span><b></b><span>分诊</span><b></b><span>编排</span><b></b><span>结论</span><b></b><span>评价</span><b></b><span>沉淀</span></div>
+    <aside class="notes">
+      <p>架构总览这页只讲骨架，不展开具体实现。更准确的架构描述来自奖项材料里的总结：这是一个“通用编排框架 + 领域专家智能体”的分层设计，核心编排层和具体业务数据域解耦。</p>
+      <p>Presentation 层负责交互、流式渲染、侧边栏、图表和反馈。Application 层提供 <code>/agent</code> SSE、GraphQL/Prometheus 代理、conversation 和 summary API。Orchestration 层负责 LangGraph 工作流、Orchestrator 和专家 Agent。最底层是可查询的数据系统和知识资产。</p>
+      <p>这套架构的边界很清楚：LLM 不替代数据源；前端不理解 LangGraph 内部；专家 Agent 不跨越自己的证据域。通用编排层负责分诊、计划、委派和报告生成，领域专家智能体负责 GraphQL、CLS、Prometheus 等证据域。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Agent Topology">
+    <p class="kicker">04 / architecture / agent topology</p>
+    <h2 class="h2">Triage：<br>先补全 Context，再分诊</h2>
+    <div class="triage-chain">
+      <div class="triage-step">
+        <span>01</span>
+        <strong>获取问题实体</strong>
+        <p>从用户输入中抽取实例、客户端、消息、时间范围等诊断对象。</p>
+      </div>
+      <b></b>
+      <div class="triage-step">
+        <span>02</span>
+        <strong>总结核心问题</strong>
+        <p>把自然语言问题整理成可执行上下文；补全缺失信息，过滤用户因果假设。</p>
+      </div>
+      <b></b>
+      <div class="triage-step">
+        <span>03</span>
+        <strong>调度目标 Agent</strong>
+        <p>根据已验证上下文进入 Orchestrator、单专家 Agent，或直接回答快速查询。</p>
+      </div>
+    </div>
+    <div class="context-output">
+      <div><span class="label">context output</span><strong>validated facts</strong><p>instance / client / message / time</p></div>
+      <div><span class="label">problem summary</span><strong>diagnosis intent</strong><p>症状、范围、用户假设、待验证问题</p></div>
+      <div><span class="label">routing decision</span><strong>target agent</strong><p>Orchestrator / MQTTAgent / LogAgent / MetricsAgent / Direct answer</p></div>
+    </div>
+    <aside class="notes">
+      <p>Triage 的价值不是简单地判断 Mode A、Mode B，也不是越早 handoff 越好。它真正解决的是：在进入复杂诊断前，先把用户问题转成一份可执行、可校验、可路由的上下文。</p>
+      <p>第一步是获取问题涉及的实体，比如实例、客户端、消息 ID 和时间范围。第二步是总结核心问题，把用户自然语言整理成诊断意图，并区分已验证事实和用户假设。第三步才是调度到对应 Agent：复杂实例问题进入 Orchestrator，明确数据域的问题进入单专家 Agent，快速查询可以直接回答。</p>
+      <p>所以这一页的顺序要强调“Context first”。Triage 不做根因诊断，但它决定后续诊断是否站在正确上下文里。如果短 clientId 还没补全、消息 ID 没查到、时间范围没解析清楚，就不应该把问题继续交给后面的 Agent。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Multi Agent Investigation">
+    <p class="kicker">05 / architecture / investigation</p>
+    <h2 class="h2">多 Agent 排查：<br>把复杂问题拆成可验证子问题</h2>
+    <div class="investigation-grid">
+      <div><span class="label">用户假设</span><strong>服务端没回 keep alive</strong><p>自然语言里可能已经包含错误因果。</p></div>
+      <div><span class="label">可验证子问题</span><ul><li>客户端是否持续发送 PINGREQ？</li><li>服务端是否收到心跳？</li><li>断连原因和 Pod 时间线是什么？</li><li>是否存在同 Client ID 接入？</li></ul></div>
+      <div><span class="label">证据来源</span><ul><li>LogAgent：心跳日志、断连原因</li><li>MQTTAgent：会话、连接事件、配置</li><li>MetricsAgent：仅用于实例级异常</li><li>Summary Search：历史模式</li></ul></div>
+    </div>
+    <div class="note-line">多 Agent 的价值不是“多查”，而是把复杂诊断变成有边界的调查过程。</div>
+    <aside class="notes">
+      <p>这页弱化 Handoff 和 Task Delegation 这些机制名词，重点讲工程方法。Orchestrator 的核心职责不是多叫几个 Agent，而是把用户问题拆成可验证的调查问题。</p>
+      <p>代码里的 Orchestrator 在委派前要回答三个问题：这个 Agent 要回答什么，当前数据是否已经足够，新结果是否会改变结论。如果不会改变结论，就跳过委派。</p>
+      <p>单客户端 keepalive 问题是一个很好的例子。LogAgent 能看心跳日志和断连原因，MQTTAgent 能看会话和连接事件，Summary Search 能给历史模式。但 MetricsAgent 没有 per-client metrics，所以它只能在怀疑实例级异常时作为辅助证据，不能作为客户端行为的直接证据。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Data And Tools">
+    <p class="kicker">06 / architecture / data & tools</p>
+    <h2 class="h2">数据源与工具层：<br>Agent 查证据，不替代数据源</h2>
+    <div class="evidence-table">
+      <div><strong>GraphQL</strong><p>实例元数据、客户端会话、连接事件</p><span>MQTTAgent / set_context</span></div>
+      <div><strong>CLS</strong><p>Proxy/Audit 日志、断连原因、订阅拒绝、消息链路</p><span>LogAgent / set_context</span></div>
+      <div><strong>Prometheus</strong><p>趋势、聚合指标、Fleet TopK</p><span>MetricsAgent</span></div>
+      <div><strong>PostgreSQL</strong><p>conversation、summary、全文检索、历史经验</p><span>Summary Search / Admin</span></div>
+      <div><strong>LLM APIs</strong><p>推理、报告、结构化 summary</p><span>Triage / Orchestrator / Summary Generator</span></div>
+    </div>
+    <div class="principle">原则：LLM 负责判断路径和解释证据，事实必须来自可查询系统。</div>
+    <aside class="notes">
+      <p>工具层的职责是提供可复核事实，不是把领域结论写死。GraphQL 回答结构化状态，CLS 回答事件和日志链路，Prometheus 回答趋势和聚合，PostgreSQL 承载历史会话和 summary，LLM 负责推理和表达。</p>
+      <p><code>set_context</code> 是一个特殊入口工具，它不仅声明侧边栏上下文，还做 instance、client、message 的级联校验。instance 走 GraphQL，client 先查 GraphQL，查不到时用 CLS fallback 做 partial ID 候选补全，message 则通过 CLS audit 生命周期分析状态。</p>
+      <p>专家 Agent 的工具也很克制：MQTTAgent 只有 GraphQL 查询，LogAgent 只有错误日志、消息追踪和 CLS 查询，MetricsAgent 只有 Prometheus instant/range 查询。这种设计让事实来源清晰，也让结论能被复核。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Observable UI">
+    <p class="kicker">07 / architecture / observable ui</p>
+    <h2 class="h2">前端可观测性：<br>为后续可评估性做铺垫</h2>
+    <div class="component-showcase" aria-label="Observable UI components">
+      <div class="component-rail" aria-label="Component tabs">
+        <button type="button" class="is-active" data-component-tab="0">1 工具调用</button>
+        <button type="button" data-component-tab="1">2 Agent 任务列表</button>
+        <button type="button" data-component-tab="2">3 查询实体</button>
+        <button type="button" data-component-tab="3">4 用户反馈</button>
+      </div>
+      <div class="component-stage">
+        <figure class="is-active">
+          <span>01 / 工具调用</span>
+          <figcaption>参数、结果、耗时与状态可复核</figcaption>
+          <img src="assets/ui-real/component-tool-call.png" alt="Expanded execute_log_query tool call with parameters, result, duration and status">
+        </figure>
+        <figure>
+          <span>02 / Agent 任务列表</span>
+          <figcaption>任务拆解、执行状态、token 与缓存成本可见</figcaption>
+          <img src="assets/ui-real/component-agent-tasks.png" alt="Agent task list with subtasks, status and token usage">
+        </figure>
+        <figure>
+          <span>03 / 查询实体</span>
+          <figcaption>实例、客户、规格、集群和 client 等诊断上下文可核对</figcaption>
+          <img src="assets/ui-real/component-query-entity.png" alt="Queried instance and client entity panel">
+        </figure>
+        <figure>
+          <span>04 / 用户反馈</span>
+          <figcaption>用户可以对具体结论点赞、点踩、标注和反馈</figcaption>
+          <img src="assets/ui-real/component-user-feedback.png" alt="User feedback highlight and thumbs controls">
+        </figure>
+      </div>
+    </div>
+    <div class="note-line">可见过程 + 可见证据 + 可见成本 + 可反馈结果</div>
+    <aside class="notes">
+      <p>这页承接架构，也为后面的评估与进化做铺垫。如果用户看不到 Agent 做了什么，就很难判断它是否走偏；如果用户不能标注具体错误，团队也很难把一次 bad case 转成系统改进。</p>
+      <p>前端展示的不是装饰性状态，而是可评估材料。工具调用展开态让证据链可检查；右侧 Agent 执行栏让多 Agent 过程不再是黑盒；上下文侧栏让用户看到输入如何被结构化和校验；feedback/highlight/review comment 则让用户把错误或关键结论精确标出来。</p>
+      <p>这里要强调：可观测性不是只为了让界面更热闹，它是评估系统的前置条件。没有可见过程，就只能凭最终报告感觉好坏；有了过程、证据、成本和反馈，Agent 才有明确的优化入口。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Context">
+    <p class="kicker">08 / lesson / context</p>
+    <h2 class="h2">Context is all you need：<br>有效上下文，而不是更多上下文</h2>
+    <div class="context-thesis">
+      <strong>有效上下文</strong>
+      <span>不是把窗口塞满，而是让进入窗口的每个 token 都能改变下一步判断。</span>
+    </div>
+    <div class="context-layout">
+      <div class="context-inputs">
+        <div class="section-label">Decision Inputs / 三层上下文</div>
+        <div class="context-stack">
+          <div class="context-layer focus">
+            <span>01 / most focused</span>
+            <strong>行为上下文：Prompt</strong>
+            <p>角色、边界、停止条件、工具策略；直接约束 Agent 如何行动、何时停止、哪些事实必须验证。</p>
+          </div>
+          <div class="context-layer">
+            <span>02 / domain directory</span>
+            <strong>领域上下文：Skills</strong>
+            <p>catalog / SOP / query template；不塞全量知识，只提供“该查什么、怎么查”的目录。</p>
+          </div>
+          <div class="context-layer">
+            <span>03 / reusable memory</span>
+            <strong>历史上下文：Summary Search</strong>
+            <p>good case 作为可复用经验，bad case 作为反面教材和行为修正信号。</p>
+          </div>
+        </div>
+      </div>
+      <div class="context-ops">
+        <div class="section-label">Engineering Controls / 工程治理</div>
+        <div class="context-ops-grid">
+          <div><strong>多 Agent 切分</strong><p>让子 Agent 只携带与任务相关的局部上下文。</p></div>
+          <div><strong>工具结果压缩</strong><p>长结果先结构化摘要，保留可追溯证据。</p></div>
+          <div><strong>文件承载中间产物</strong><p>大段日志、查询结果不直接挤占主上下文。</p></div>
+          <div><strong>上下文保序</strong><p>稳定消息顺序，降低重复推理成本并适配 KV cache。</p></div>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">
+      <p>上下文不是越多越好。真实系统里，过多上下文会增加成本、降低注意力密度，还会把旧错误带入新判断。Context engineering 的目标不是塞满窗口，而是提高每个 token 的决策密度。</p>
+      <p>本项目里有三层上下文。第一层是行为上下文，也就是代码里给 Agent 的 system prompt，它约束角色、边界、停止条件和工具使用策略。第二层是领域上下文，也就是 skill 中的 catalog、SOP 和 query template，让 Agent 知道该查什么、怎么查。第三层是历史上下文，通过 summary search 把 good case 和 bad case 变成可检索经验。</p>
+      <p>工程上还有几个技巧：用多 Agent 切分上下文，避免一个主 Agent 背所有知识；工具输出过长时压缩或写文件；summary transcript 和前端工具结果都做 compact；用户反馈进入下一轮时保持上下文顺序稳定，以适配 KV cache。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Tool Design">
+    <p class="kicker">09 / lesson / tool design</p>
+    <h2 class="h2">工具设计：<br>给原子能力，不给僵硬 SOP</h2>
+    <div class="compare-wide">
+      <div class="bad">
+        <span class="label">not recommended</span>
+        <h3>业务 SOP 工具</h3>
+        <code>诊断订阅失败()</code>
+        <code>判断 keepalive 根因()</code>
+        <p>工具越细，选择越困难；SOP 固化在工具里，边界场景难调整；结论被黑盒化。</p>
+      </div>
+      <div class="good">
+        <span class="label">recommended</span>
+        <h3>原子事实工具 + skill 目录 + Agent 判断</h3>
+        <code>GraphQL 查询</code>
+        <code>CLS 查询</code>
+        <code>Prometheus 查询</code>
+        <code>Summary search</code>
+        <p>工具负责事实，skill 负责方法，Agent 负责判断。</p>
+      </div>
+    </div>
+    <aside class="notes">
+      <p>工具设计这页的核心观点是：不要把诊断 SOP 做成黑盒工具。如果工具直接叫“诊断订阅失败”或“判断 keepalive 根因”，它会把查询路径、判断逻辑和结论封装在一起。短期看方便，长期会让 Agent 难以调整和复核。</p>
+      <p>本项目选择给 Agent 原子事实工具，再用 skill 提供方法目录。MQTTAgent 只有 GraphQL 查询，LogAgent 只有错误日志、消息追踪和 CLS 查询，MetricsAgent 只有 Prometheus instant/range 查询。查询模板、指标目录和领域方法放在 skill 里。</p>
+      <p>这个设计的代价是 Agent 需要更好的上下文和可观测性，否则它会乱试工具。但收益也很明确：工具保持稳定，诊断策略可以随经验演进，结论背后的证据链更容易复核。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Tool Design Skill Catalog">
+    <p class="kicker">10 / lesson / tool design</p>
+    <h2 class="h2">工具设计：<br>用 Skill Catalog 引导正确查询</h2>
+    <div class="skill-catalog-layout">
+      <div class="catalog-card">
+        <span class="label">catalog skill</span>
+        <h3>query-catalog</h3>
+        <p>入口只给目录和触发条件：写 custom SQL、execute_log_query、断连分析、错误分布、客户端查找、消息消费、投递延迟等。</p>
+        <div class="catalog-tree">
+          <div><strong>proxy-log-queries</strong><span>断连 / 错误 / client 解析 / Packet / 线程池</span></div>
+          <div><strong>auth-log-queries</strong><span>认证失败 / 限流 / 授权拒绝 / ACL</span></div>
+          <div><strong>audit-log-queries</strong><span>消息消费 / fanout / 延迟 / 流量 / 重试</span></div>
+        </div>
+      </div>
+      <div class="catalog-flow">
+        <div><strong>1. 先按症状选 reference</strong><p>Client disconnects → proxy；Message loss → audit；Auth failures → auth。</p></div>
+        <div><strong>2. 再读场景模板</strong><p>例如 keepalive timeout：用 proxy log 的 Top disconnecting clients 模板。</p></div>
+        <div><strong>3. 最后替换变量执行</strong><p>填入 instance、client_prefix、topic、时间窗；由 execute_log_query 查询 CLS。</p></div>
+      </div>
+    </div>
+    <div class="query-example-grid">
+      <div class="bad">
+        <span class="label">bad query</span>
+        <code>message LIKE '%disconnect%'</code>
+        <p>只做模糊文本搜索，缺少 topic_type、实例过滤、原因提取和聚合，容易把无关日志混进来。</p>
+      </div>
+      <div class="good">
+        <span class="label">good query</span>
+        <code>__TAG__.namespace:"$instance" AND message:"keepalive_timeout"
+| select count(*) as count,
+  regexp_extract(message, 'client-id=([^,]+)', 1) as client_id
+group by client_id order by count desc</code>
+        <p>直接复用 catalog 中的 keepalive timeout 模板：先限定实例和原因，再提取 client_id 并按次数排序。</p>
+      </div>
+    </div>
+    <aside class="notes">
+      <p>这页用 LogAgent 的 <code>skills/log/query-catalog</code> 举例。这个 skill 不是把一套 SOP 封成工具，而是给 Agent 一个可导航的查询目录。入口文件只告诉模型：有哪些 reference，分别覆盖 proxy、auth、audit 哪些问题，以及症状应该去哪个模板。</p>
+      <p>真正的查询细节放在 reference 里。比如 <code>proxy-log-queries.md</code> 里有断连分析、错误日志分布、client ID 模糊搜索、Packet inspection 和线程池健康；<code>audit-log-queries.md</code> 里有 topic/client 分析、fanout、未消费消息、延迟、流量和重试。</p>
+      <p>这种设计能引导 LLM 写正确查询：先根据症状选择日志类型，再读对应模板，最后替换变量。反例是让模型直接写一个 <code>LIKE '%disconnect%'</code> 的大查询，既没有实例边界，也没有结构化聚合。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Deterministic Output">
+    <p class="kicker">11 / lesson / deterministic output</p>
+    <h2 class="h2">确定性输出：<br>用 Spec 约束 AI，用前端拿真实数据</h2>
+    <div class="spec-pipeline">
+      <div><span class="label">LLM emits spec</span><pre>```metrics-chart
+query: sum(rate(...))
+time: 2026-03-12
+unit: ops
+```</pre></div>
+      <div class="arrow"></div>
+      <div><span class="label">API fetches real data</span><p>Prometheus / GraphQL proxy 根据 spec 重新取数。</p></div>
+      <div class="arrow"></div>
+      <div><span class="label">React renders</span><p>确定性组件渲染图表、排名和建议块。</p></div>
+    </div>
+    <div class="generative-ui-note">
+      <strong>Markdown wall of text -> Generative UI：</strong>
+      <a href="https://generativeui.github.io">generativeui.github.io</a>
+    </div>
+    <aside class="notes">
+      <p>这页讲一个非常实际的幻觉治理方案：不要让 AI 直接输出图表数据。完整时序数据 token 高、容易过期，也没有必要让模型生成。</p>
+      <p>项目采用 Spec over Data。MetricsAgent 输出的是 <code>metrics-chart</code>、<code>instance-ranking</code>、<code>suggestions</code> 这样的轻量 spec，里面包含查询、时间范围、单位、legend、排名等结构化字段。前端解析 spec 后调用 Prometheus 或 GraphQL 代理拿真实数据，再用确定性 React 组件渲染。</p>
+      <p>这里要严谨：这个方案不能保证诊断结论天然正确，因为模型仍然负责选择查询和解释结果；它解决的是展示数据不让 AI 编。图表、排名和后续可视化交互由确定性系统完成，能显著降低幻觉和 token 成本。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Deterministic Output Result">
+    <p class="kicker">12 / lesson / deterministic output</p>
+    <h2 class="h2">确定性输出：<br>把图表交给前端组件</h2>
+    <div class="deterministic-result">
+      <div class="deterministic-benefits">
+        <div><strong>确保无数据幻觉</strong><p>点位、排名、趋势来自真实接口。</p></div>
+        <div><strong>节约 token</strong><p>大量数据输出由前端直接渲染。</p></div>
+        <div><strong>一致、可预期</strong><p>同一份 spec 输出稳定结构。</p></div>
+        <div><strong>表达能力更强</strong><p>标注、缩放、hover、跳转交给前端。</p></div>
+      </div>
+      <figure class="deterministic-chart">
+        <img src="assets/ui-real/deterministic-chart.png" alt="Rendered online connection trend chart with annotated drop and recovery points">
+      </figure>
+    </div>
+    <aside class="notes">
+      <p>这一页展示前端组件的实际效果。模型不是直接写图表数据，而是描述需要看哪个指标、哪个时间窗、哪些关键点需要标注。前端组件再用 spec 去查真实数据并渲染。</p>
+      <p>这样做有三个收益。第一，图表数据不会由模型编造；第二，重复生成时组件结构稳定，用户预期稳定；第三，前端组件能提供更强的表达力，比如标注、缩放、hover、跳转和交互查看。</p>
+    </aside>
+  </section>
+
+  <section class="slide" data-title="Evaluation">
+    <p class="kicker">13 / lesson / evaluation</p>
+    <h2 class="h2">Agent 不会一次搭好：<br>需要明确的评估与进化路径</h2>
+    <div class="eval-grid">
+      <div><strong>Observe</strong><p class="lead">不可量化的东西，不可优化。</p><p>通过 Agent Middleware 与 LangGraph 事件流记录每一次 tool call、LLM 调用、Agent 调度和 token 成本，结构化追踪诊断流程。用户可以展开工具、查看任务列表和成本；团队获得可复盘的执行数据。</p><div class="eval-tags"><span>tool trace</span><span>agent timeline</span><span>token usage</span></div></div>
+      <div><strong>Evaluate</strong><p class="lead">让用户给出评价，而不是靠评估 LLM 猜测。</p><p>支持 thumbs、文本高亮和 review comment。用户直接标出“这句有用”“这段错误”“这里应该怎么改”；系统记录真实用户判断，避免再引入一个模型去猜好坏。</p><div class="eval-tags"><span>thumbs</span><span>highlight</span><span>review comment</span></div></div>
+      <div><strong>Summarize</strong><p class="lead">把一次诊断转成可检索经验。</p><p>系统把对话、工具证据、用户反馈整理成 summary。good case 成为历史参考，bad case 保留失败原因和修正建议；后续相似问题可以先检索经验再排查。</p><div class="eval-tags"><span>good case</span><span>bad case</span><span>similar search</span></div></div>
+      <div><strong>Improve</strong><p class="lead">从下层上下文精炼通用策略到上层。</p><p>把单次 bad case、工具调用和用户修正，精炼成更通用的 prompt 约束、skill 目录或工具边界。这个过程类似训练：不是记住一次错误，而是把局部反馈提炼成未来决策的先验。</p><div class="eval-tags"><span>prompt rule</span><span>skill update</span><span>tool boundary</span></div></div>
+    </div>
+    <aside class="notes">
+      <p>这一页是第三章的收束。Agent 不可能一次搭好，业务会变，日志会变，指标会变，客户问题也会变。所以系统需要一条明确的评估与进化路径。</p>
+      <p>没有评估，Agent 只能靠感觉优化；没有可观测，评估也找不到落点。前端的过程可见、工具调用、token 使用和反馈标注，都是为了让团队知道问题发生在哪里。</p>
+      <p>代码里有几个对应点：<code>EvaluationTurn</code> 紧跟 assistant turn，保证用户到底评价了哪段内容；<code>buildEvaluationSummary()</code> 把 thumbs、highlights 和 comment 转成 <code>[User Feedback]</code> YAML；summary schema 里有 agent performance issues 和 workflow improvement suggestions；再进一步，可以用 create-agent-skill 的流程把 bad case 转成新的 skill 或 prompt 约束。</p>
+    </aside>
+  </section>
+
+  <section class="slide thankyou" data-title="Thank You">
+    <p class="kicker">14 / closing</p>
+    <h2 class="h1">Thank You</h2>
+    <p class="lede">感谢聆听</p>
+    <div class="qa">Q&A</div>
+    <aside class="notes">
+      <p>到这里，正式分享就结束了。最后不再额外总结，因为前面已经按使用、架构、经验三段讲完。</p>
+      <p>如果进入 Q&A，我建议优先围绕几个问题展开：为什么要把 Triage 和 Orchestrator 拆开；单客户端问题为什么不能直接看实例级 Metrics；skill、summary 和 feedback 分别解决什么问题；以及 Spec over Data 到底解决了哪类幻觉。</p>
+      <p>谢谢大家。</p>
+    </aside>
+  </section>
+
+</div>
+
+<div class="hint">S 演讲者视图 · T 切换主题 · ← → 翻页 · F 全屏 · O 总览</div>
+<script src="../.agents/skills/html-ppt/assets/runtime.js"></script>
+<script>
+  (() => {
+    const showcase = document.querySelector('.component-showcase');
+    if (!showcase) return;
+
+    const tabs = [...showcase.querySelectorAll('[data-component-tab]')];
+    const frames = [...showcase.querySelectorAll('.component-stage figure')];
+
+    function setComponent(index) {
+      const next = Math.max(0, Math.min(frames.length - 1, index));
+      tabs.forEach((tab, i) => tab.classList.toggle('is-active', i === next));
+      frames.forEach((frame, i) => frame.classList.toggle('is-active', i === next));
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => setComponent(Number(tab.dataset.componentTab)));
+    });
+
+    document.addEventListener('keydown', (event) => {
+      const activeSlide = document.querySelector('.slide.is-active');
+      if (!activeSlide || activeSlide.dataset.title !== 'Observable UI') return;
+      if (!/^[1-4]$/.test(event.key)) return;
+      event.preventDefault();
+      setComponent(Number(event.key) - 1);
+    });
+  })();
+</script>
+</body>
+</html>
