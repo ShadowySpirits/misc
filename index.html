@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Misc Slides</title>
+  <style>
+    :root {
+      --ink: #09204a;
+      --muted: #4b5f83;
+      --line: #0f356b;
+      --blue: #1f66d1;
+      --paper: #f8fbff;
+      --panel: #ffffff;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      width: min(1120px, calc(100vw - 48px));
+      margin: 0 auto;
+      padding: 72px 0;
+    }
+    .kicker {
+      margin: 0 0 18px;
+      color: var(--blue);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(48px, 7vw, 88px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    .lede {
+      margin: 22px 0 46px;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 20px;
+      line-height: 1.55;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      display: grid;
+      min-height: 210px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: inherit;
+      text-decoration: none;
+    }
+    .card:hover {
+      outline: 2px solid var(--blue);
+      outline-offset: -2px;
+    }
+    .card small {
+      color: var(--blue);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .card strong {
+      align-self: end;
+      display: block;
+      font-size: 26px;
+      line-height: 1.18;
+    }
+    .card span {
+      display: block;
+      margin-top: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    footer {
+      margin-top: 42px;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="kicker">misc / slide index</p>
+    <h1>PPT 文件浏览器</h1>
+    <p class="lede">这个站点用于托管技术分享、汇报和实验性 HTML slides。后续新增 PPT 时，在这里追加入口即可。</p>
+
+    <section class="grid" aria-label="Slide decks">
+      <a class="card" href="/diagnosis-agent-tech-share/">
+        <small>tech sharing</small>
+        <strong>从诊断工具到<br>可协作 Agent</strong>
+        <span>MQTT 智能诊断平台的使用、架构与 Agent 开发经验。</span>
+      </a>
+    </section>
+
+    <footer>GitHub: ShadowySpirits/misc · Vercel: misc</footer>
+  </main>
+</body>
+</html>
